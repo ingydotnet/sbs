@@ -1,0 +1,10 @@
+# Source this file from bash or zsh
+
+[[ ${ZSH_VERSION-} ]] &&
+  SBS_ROOT=$0 ||
+  SBS_ROOT=${BASH_SOURCE[0]}
+
+SBS_ROOT=$(cd "$(dirname "$SBS_ROOT")" && pwd)
+export SBS_ROOT
+
+export PATH=$SBS_ROOT/bin:$SBS_ROOT/ys/bin:$PATH
