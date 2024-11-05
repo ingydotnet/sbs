@@ -5,7 +5,8 @@ defn main(*files):
   when files.!:          die('No files specified')
   when (files.# % 2).?:  die('Specify an even number of files')
   each file files:
-    when-not fs-f(file): die("File '$file' does not exist")
+    when fs-f(file).! && (file != '_'):
+      die("File '$file' does not exist")
 
   markdown =: |
     ### Side by Side File Comparisons
@@ -17,8 +18,10 @@ defn main(*files):
   markdown +=:
     reduce _ '' partition(2 files):
       fn(md [left right]):
-        ltext =: left:slurp:chomp
-        rtext =: right:slurp:chomp
+        ltext =:
+          if left != '_': left:slurp:chomp "\n"
+        rtext =:
+          if right != '_': right:slurp:chomp "\n"
         lnum =: ltext:lines:count
         rnum =: rtext:lines:count
         ltext +=:
@@ -32,7 +35,15 @@ defn main(*files):
 
           ----
           <table>
-          <tr><td>`$left`</td><td>`$right`</td></tr>
+          <tr><td>
+
+          **`$left`**
+
+          </td><td>
+
+          **`$right`**
+
+          </td></tr>
           <tr><td>
 
           ```$(left.replace(/.*\./))
