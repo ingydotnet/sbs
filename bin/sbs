@@ -1,5 +1,7 @@
 #!/usr/bin/env ys-0
-source <(curl '-s' 'https://yamlscript.org/run-ys') "$@" :
+source <(curl '-s' 'https://yamlscript.org/run-ys') "$@":
+
+fmt-11ty =: ENV.SBS_11TY.?
 
 defn main(*files):
   when files.!:          die('No files specified')
@@ -26,10 +28,25 @@ defn main(*files):
         rnum =: rtext:lines:count
         ltext +=:
           or _ '':
-            when lnum < rnum: (rnum - lnum).++ * "\n"
+            when lnum < rnum:
+              ((rnum - lnum) * "\n") +
+              fmt-11ty.if("\n" '')
         rtext +=:
           or _ '':
-            when rnum < lnum: (lnum - rnum).++ * "\n"
+            when rnum < lnum:
+              ((lnum - rnum) * "\n") +
+              fmt-11ty.if("\n" '')
+
+        raw-begin =: fmt-11ty && "{% raw %}"
+        raw-end   =: fmt-11ty && "{% endraw %}"
+
+        exts =::
+          ys: yaml
+
+        lext =: left:fs/extension
+        lext =: exts.$lext || lext
+        rext =: right:fs/extension
+        rext =: exts.$rext || rext
 
         md +: |
 
@@ -46,14 +63,14 @@ defn main(*files):
           </td></tr>
           <tr><td>
 
-          ```$(left.replace(/.*\./))
-          $ltext
+          ```$lext
+          $raw-begin$ltext$raw-end
           ```
 
           </td><td>
 
-          ```$(right.replace(/.*\./))
-          $rtext
+          ```$rext
+          $raw-begin$rtext$raw-end
           ```
 
           </td></tr>
@@ -67,8 +84,9 @@ defn gist(markdown):
 
   api-url =: 'https://api.github.com/gists'
 
-  api-key =: ENV.SBS_TOKEN ||
-    die('No GitHub API token found in SBS_TOKEN')
+  api-token-file =: ENV.GITHUB_API_TOKEN_FILE |||
+    "$(ENV.HOME)/.github-api-token"
+  api-key =: api-token-file:read:chomp
 
   request =::
     :headers:
