@@ -1,8 +1,6 @@
 #!/usr/bin/env ys-0
 source <(curl '-sL' getys.org/run) "$@" :  # Run w/ bash support
 
-fmt-11ty =: ENV.SBS_11TY.?
-
 defn main(*files):
   when files.!:          die('No files specified')
   when (files.# % 2).?:  die('Specify an even number of files')
@@ -29,16 +27,11 @@ defn main(*files):
         ltext +=:
           or _ '':
             when lnum < rnum:
-              ((rnum - lnum) * "\n") +
-              fmt-11ty.if("\n" '')
+              ((rnum - lnum) * "\n")
         rtext +=:
           or _ '':
             when rnum < lnum:
-              ((lnum - rnum) * "\n") +
-              fmt-11ty.if("\n" '')
-
-        raw-begin =: fmt-11ty && "{% raw %}"
-        raw-end   =: fmt-11ty && "{% endraw %}"
+              ((lnum - rnum) * "\n")
 
         exts =::
           ys: yaml
@@ -64,13 +57,13 @@ defn main(*files):
           <tr><td>
 
           ```$lext
-          $raw-begin$ltext$raw-end
+          $ltext
           ```
 
           </td><td>
 
           ```$rext
-          $raw-begin$rtext$raw-end
+          $rtext
           ```
 
           </td></tr>
