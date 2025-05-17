@@ -1,5 +1,5 @@
 #!/usr/bin/env ys-0
-source <(curl '-s' 'https://yamlscript.org/run-ys') "$@":
+source <(curl '-sL' getys.org/run) "$@" :  # Run w/ bash support
 
 fmt-11ty =: ENV.SBS_11TY.?
 
@@ -117,4 +117,3 @@ defn gist(markdown):
           json/load(response.body):yaml/dump)
 
   say: json/load(response.body).html_url
-
