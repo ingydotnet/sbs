@@ -5,7 +5,7 @@ defn main(*files):
   when files.!:          die('No files specified')
   when (files.# % 2).?:  die('Specify an even number of files')
   each file files:
-    when fs-f(file).! && (file != '_'):
+    when fs-e(file).! && (file != '_'):
       die("File '$file' does not exist")
 
   markdown =: |
